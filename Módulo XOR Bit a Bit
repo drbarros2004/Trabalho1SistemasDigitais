@@ -1,0 +1,27 @@
+library IEEE;
+use IEEE.STD_LOGIC_1164.ALL;
+
+-- Esse módulo realiza a operação XOR entre cada par de bits das entradas A e B, dois vetores de 4 bits cada.
+-- A operação XOR tem resultado 1 sempre que A(i) =! de B(i).
+-- A saída S é o resultado da operação.
+
+entity xorbitabit is
+
+Port ( A : in  STD_LOGIC_VECTOR (3 downto 0);
+       B : in  STD_LOGIC_VECTOR (3 downto 0);
+       S : out  STD_LOGIC_VECTOR (3 downto 0));
+end xorbitabit;
+
+architecture Behavioral of xorbitabit is
+
+begin
+
+
+S(0) <= A(0) XOR B(0);
+S(1) <= A(1) XOR B(1);
+S(2) <= A(2) XOR B(2);
+S(3) <= A(3) XOR B(3);
+
+
+end Behavioral;
+
