@@ -1,0 +1,236 @@
+library IEEE;
+use IEEE.STD_LOGIC_1164.ALL;
+use IEEE.std_logic_arith.ALL;
+
+entity ULA is
+
+-- Nessa parte, colocamos os módulos já criados como componentes da ULA, listando todas suas entradas e saídas.
+-- seletor é a única varíavel de entrada que é propriamente definida pelo usuário, e serve para selecionar a 
+-- operação que tiver seu resultado exibido em S.
+
+Port ( --A : in  STD_LOGIC_VECTOR(3 downto 0);
+       --B : in  STD_LOGIC_VECTOR(3 downto 0);
+	   seletor : in  STD_LOGIC_VECTOR (2 downto 0);
+       S : out  STD_LOGIC_VECTOR (3 downto 0);
+	   bit_sinal: out STD_LOGIC;
+	   ovf: out STD_LOGIC;
+	   zero: out STD_LOGIC;
+	   negativo: out STD_LOGIC);
+	   
+-- bit_sinal (bit de sinal), ovf (overflow), zero e negativo são as 4 flags do trabalho.
+-- bit_sinal (bit de sinal) é 1 quando o número exibido em S é menor do que 0.
+-- ovf (overflow) é 1 quando existe overflow no número exibido em S.
+-- zero é 1 sempre que o número exibido em S for 0000.
+-- negativo é 1 sempre que o número exibido em S for um número negativo, sendo necessária sua conversão para binário,
+-- já que ele está em sua forma de complemento a 2.
+	   
+end ULA;
+
+architecture Structural of ULA is
+
+component somador4bits is 
+
+Port ( A : in  STD_LOGIC_VECTOR(3 downto 0);
+       B : in  STD_LOGIC_VECTOR(3 downto 0);
+	   S : out  STD_LOGIC_VECTOR (3 downto 0);
+	   ovf :  out STD_LOGIC;
+	   cout : out STD_LOGIC;
+	   C : inout  STD_LOGIC_VECTOR (3 downto 0));
+		 
+end component;
+
+
+component subtracao4bits is
+
+Port ( A : in  STD_LOGIC_VECTOR(3 downto 0);
+       B : in  STD_LOGIC_VECTOR(3 downto 0);
+       S : out  STD_LOGIC_VECTOR (3 downto 0);
+	   bitS : out STD_LOGIC;
+	   C : inout  STD_LOGIC_VECTOR (3 downto 0);
+	   CS : inout STD_LOGIC);
+
+end component;
+
+
+component complemento2 is
+
+Port ( A : in  STD_LOGIC_VECTOR(3 downto 0);
+	   S : out  STD_LOGIC_VECTOR(3 downto 0);
+       C : inout  STD_LOGIC_VECTOR(3 downto 0));
+		 
+end component;
+
+
+component complemento1 is
+
+Port ( A : in  STD_LOGIC_VECTOR(3 downto 0);
+			 S : out  STD_LOGIC_VECTOR(3 downto 0));
+			 
+end component;
+
+
+component rightShift is 
+
+Port ( A : in  STD_LOGIC_VECTOR(3 downto 0);
+	   S : out  STD_LOGIC_VECTOR(3 downto 0));
+		 
+end component;
+
+
+component leftShift is 
+
+Port ( A : in  STD_LOGIC_VECTOR (3 downto 0);
+		 S : out  STD_LOGIC_VECTOR (3 downto 0));
+		
+end component;
+
+
+component xorbitabit is
+
+Port ( A : in  STD_LOGIC_VECTOR(3 downto 0);
+       B : in  STD_LOGIC_VECTOR(3 downto 0);
+       S : out  STD_LOGIC_VECTOR (3 downto 0));
+
+end component;
+
+
+component comparador is
+
+Port     ( A : in  STD_LOGIC_VECTOR(3 downto 0);
+           B : in  STD_LOGIC_VECTOR(3 downto 0);
+		  ansEGS: out STD_LOGIC_VECTOR (3 downto 0);
+		  G : inout  STD_LOGIC_VECTOR (3 downto 0);
+		  E : inout  STD_LOGIC_VECTOR (3 downto 0);
+          S : inout  STD_LOGIC_VECTOR (3 downto 0));
+			  
+end component;
+
+--Aqui, colocamos saídas e entradas como sinais, para que funcionem nessa forma de implementação.
+
+SIGNAL A: STD_LOGIC_VECTOR (3 downto 0);
+SIGNAL B: STD_LOGIC_VECTOR (3 downto 0);
+
+SIGNAL A_cnt: unsigned (3 downto 0) := (others => '0');
+SIGNAL B_cnt: unsigned (3 downto 0) := (others => '0');
+
+SIGNAL comparador_s : STD_LOGIC_VECTOR (3 downto 0);
+SIGNAL complemento1_s : STD_LOGIC_VECTOR (3 downto 0);
+SIGNAL complemento2_s : STD_LOGIC_VECTOR (3 downto 0);
+SIGNAL leftShift_s : STD_LOGIC_VECTOR (3 downto 0);
+SIGNAL rightShift_s : STD_LOGIC_VECTOR (3 downto 0);
+SIGNAL somador4bits_s : STD_LOGIC_VECTOR (3 downto 0);
+SIGNAL subtracao4bits_s : STD_LOGIC_VECTOR (3 downto 0);
+SIGNAL xorbitabit_s : STD_LOGIC_VECTOR (3 downto 0);
+
+SIGNAL ovf_s, bitS_s, cout_s: STD_LOGIC;
+
+SIGNAL clk : STD_LOGIC := '1';
+SIGNAL clk_period : time := 1000ms;
+SIGNAL mm : STD_LOGIC_VECTOR (3 downto 0) := "1111";
+
+begin
+
+comparador_Label : comparador port map (A, B, comparador_s);
+complemento1_Label : complemento1 port map (A, complemento1_s);
+complemento2_Label : complemento2 port map (A, complemento2_s);
+leftShift_Label : leftShift port map (A, leftShift_s);
+rightShift_Label : rightShift port map (A, rightShift_s);
+somador4bits_Label : somador4bits port map (A, B, somador4bits_s, ovf_s, cout_s);
+subtracao4bits_Label : subtracao4bits port map (A, B, subtracao4bits_s, bitS_s);
+xorbitabit_Label : xorbitabit port map (A, B, xorbitabit_s);
+
+process (A , B, seletor, comparador_s, complemento1_s, complemento2_s, leftShift_s, rightShift_s, somador4bits_s, subtracao4bits_s, xorbitabit_s)
+
+--Nessa etapa, definimos as operações com base no valor da varíavel da chave seletora.
+
+begin
+
+	case seletor is
+		when "000" => -- somador de 4 bits
+			ovf <= ovf_s;
+			S <= somador4bits_s;
+			bit_sinal <= '0';
+			zero <= not (somador4bits_s(0) or somador4bits_s(1) or somador4bits_s(2) or somador4bits_s(3));
+			negativo <= '0';
+			
+			
+		
+		when "001" => -- subtrator de 4 bits + sinal
+			bit_sinal <= bitS_s;
+			S <= subtracao4bits_s;
+			zero <= not (subtracao4bits_s(0) or subtracao4bits_s(1) or subtracao4bits_s(2) or subtracao4bits_s(3));
+			negativo <= bitS_s;
+			ovf <= '0';
+			
+		
+		when "010" => -- complemento a 1
+			S <= complemento1_s;
+			zero <= not (complemento1_s(0) or complemento1_s(1) or complemento1_s(2) or complemento1_s(3));
+			ovf <= '0';
+			bit_sinal <= '0';
+			negativo <= '0';
+		
+		when "011" => -- complemento a 2
+			S <= complemento2_s;
+			zero <= not (complemento2_s(0) or complemento2_s(1) or complemento2_s(2) or complemento2_s(3));
+			
+		when "100" => -- comparador
+			S <= comparador_s;
+			ovf <= '0';
+			bit_sinal <= '0';
+			negativo <= '0';
+			zero <= '0';
+			
+		
+		when "101" => -- leftSHift
+			S <= leftShift_s;
+			ovf <= '0';
+			bit_sinal <= '0';
+			negativo <= '0';
+			zero <= not(leftShift_s(0) or leftShift_s(1) or leftShift_s(2) or leftShift_s(3));
+			
+		
+		when "110" => -- rightSHift
+			S <= rightShift_s;
+			ovf <= '0';
+			bit_sinal <= '0';
+			negativo <= '0';
+			zero <= not(rightShift_s(0) or rightShift_s(1) or rightShift_s(2) or rightShift_s(3));
+		
+		when others => -- XOR Bit a Bit
+			S <= xorbitabit_s;
+			ovf <= '0';
+			bit_sinal <= '0';
+			negativo <= '0';
+			zero <= not(xorbitabit_s(0) or xorbitabit_s(1) or xorbitabit_s(2) or xorbitabit_s(3));
+			
+end case;
+end process;
+
+--Aqui, criamos um clock que funciona na simulação, para mostrar o funcionamento das nossas operações.
+
+clk <= not clk after clk_period/2;
+
+process (clk) begin
+
+    if rising_edge(clk) then
+        if B_cnt = unsigned(mm) then
+           A_cnt <= A_cnt + 1;
+        end if;
+        B_cnt <= B_cnt + 1;
+    end if;
+    
+end process;
+
+process (a_cnt, b_cnt) begin
+
+    for i in 3 downto 0 loop
+        a(i) <= A_cnt(i);
+        b(i) <= b_cnt(i);
+    end loop;
+end process;
+
+
+
+end Structural;
+
