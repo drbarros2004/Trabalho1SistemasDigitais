@@ -1,0 +1,27 @@
+library IEEE;
+use IEEE.STD_LOGIC_1164.ALL;
+
+-- Esse módulo realiza o complemento a 1 de A.
+-- A é um vetor de 4 bits.
+-- Tem S (resposta do complemento a 1 de A) como saída.
+
+entity complemento1 is
+			  
+	Port ( A : in STD_LOGIC_VECTOR (3 downto 0);
+		   S : out STD_LOGIC_VECTOR (3 downto 0));
+
+end complemento1;
+
+architecture Behavioral of complemento1 is
+
+begin
+
+S(0) <= NOT A(0);
+S(1) <= NOT A(1);
+S(2) <= NOT A(2);
+S(3) <= NOT A(3);
+
+
+end Behavioral;
+
+

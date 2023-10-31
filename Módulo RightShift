@@ -1,0 +1,28 @@
+library IEEE;
+use IEEE.STD_LOGIC_1164.ALL;
+
+-- Esse módulo realiza um Shift para a direita de A.
+-- A é um vetor de 4 bits que serve como entrada da operação.
+-- Essa operação funciona "empurrando" um '0' pela direita do número binário A.
+-- Assim, o 0 ocupa S(0), A(0) ocupa S(1) e assim por diante.
+-- S é a resposta da operação, sendo o número A com um shift para a direita.
+
+entity rightShift is
+			  
+Port ( A : in  STD_LOGIC_VECTOR(3 downto 0);
+	   S : out  STD_LOGIC_VECTOR (3 downto 0));
+		
+			  
+end rightShift;
+
+architecture Behavioral of rightShift is
+
+begin
+
+S(3) <= A(2);
+S(2) <= A(1);
+S(1) <= A(0);
+S(0) <= '0';
+
+
+end Behavioral;

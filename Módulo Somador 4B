@@ -1,0 +1,41 @@
+library IEEE;
+use IEEE.STD_LOGIC_1164.ALL;
+
+-- Esse módulo realiza a soma entre A e B.
+-- A e B são 2 vetores de 4 bits cada.
+-- Tem como saídas S (resposta da soma), ovf (overflow) e cout (Carry-out).
+
+entity somador4bits is
+			  
+Port ( A : in  STD_LOGIC_VECTOR(3 downto 0);
+       B : in  STD_LOGIC_VECTOR(3 downto 0);
+	   S : out  STD_LOGIC_VECTOR (3 downto 0);
+	   ovf :  out STD_LOGIC;
+	   cout : out STD_LOGIC;
+	   C : inout  STD_LOGIC_VECTOR (3 downto 0));
+		 
+end somador4bits;
+
+architecture Behavioral of somador4bits is
+
+begin
+
+S(0) <= (A(0) xor B(0));
+C(1) <= (A(0) and B(0));
+
+
+S(1) <= (NOT A(1) AND NOT B(1) AND C(1)) OR (NOT A(1) AND B(1) AND NOT C(1)) OR (A(1) AND B(1) AND C(1)) OR (A(1) AND NOT B(1) AND NOT C(1));
+C(2) <= (B(1) AND C(1)) OR (A(1) AND C(1)) OR (A(1) AND B(1));
+
+
+S(2) <= (NOT A(2) AND NOT B(2) AND C(2)) OR (NOT A(2) AND B(2) AND NOT C(2)) OR (A(2) AND B(2) AND C(2)) OR (A(2) AND NOT B(2) AND NOT C(2));
+C(3) <= (B(2) AND C(2)) OR (A(2) AND C(2)) OR (A(2) AND B(2));
+
+
+S(3) <= (NOT A(3) AND NOT B(3) AND C(3)) OR (NOT A(3) AND B(3) AND NOT C(3)) OR (A(3) AND B(3) AND C(3)) OR (A(3) AND NOT B(3) AND NOT C(3));
+COUT <= (B(3) AND C(3)) OR (A(3) AND C(3)) OR (A(3) AND B(3));
+
+ovf <= (B(3) AND C(3)) OR (A(3) AND C(3)) OR (A(3) AND B(3));
+
+
+end Behavioral;

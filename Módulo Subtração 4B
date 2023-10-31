@@ -1,0 +1,42 @@
+library IEEE;
+use IEEE.STD_LOGIC_1164.ALL;
+
+-- Esse módulo realiza a subtração entre A e B (A - B).
+-- A e B são 2 vetores de 4 bits cada. Ambos sempre "entram" positivos no módulo, já que nosso contador não
+-- gera números negativos. Dessa forma, a subtração se inicia quando B é convertido para sua forma em complemento a 2,
+-- se tornando -B. Com B em complemento a 2, é só realizar a soma (A + (-B)).
+-- Se o S (resultado da subtração) for negativo, S sairá em complemento a 2. Se não, sairá em sua forma binária normal.
+ 
+-- Tem como saídas S (resposta da subtração) e bitS (bit de sinal).
+-- O bit de sinal é 1 quando resultado de S é negativo, e 0 quando o resultado S é positivo.
+
+entity subtracao4bits is
+			  
+Port ( A : in  STD_LOGIC_VECTOR(3 downto 0);
+       B : in  STD_LOGIC_VECTOR(3 downto 0);
+	   C : inout  STD_LOGIC_VECTOR (3 downto 0);
+       S : out  STD_LOGIC_VECTOR (3 downto 0);
+	   bitS : out STD_LOGIC;
+	   CS : inout STD_LOGIC);
+		 
+end subtracao4bits;
+
+architecture Behavioral of subtracao4bits is
+
+begin
+
+S(0) <= A(0) XOR (B(0));
+S(1) <= A(1) XOR ((NOT B(1)) XOR C(1));
+S(2) <= A(2) XOR ((NOT B(2)) XOR C(2));
+S(3) <= A(3) XOR ((NOT B(3)) XOR C(3));
+  bitS <=(NOT CS);
+
+
+C(1) <= A(0) OR (NOT B(0));
+C(2) <= (A(1) AND ((NOT B(1)) OR C(1))) OR ((NOT B(1)) AND C(1));
+C(3) <= (A(2) AND ((NOT B(2)) OR C(2))) OR ((NOT B(2)) AND C(2));
+  CS <= (A(3) AND ((NOT B(3)) OR C(3))) OR ((NOT B(3)) AND C(3));
+
+
+end Behavioral;
+

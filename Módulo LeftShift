@@ -1,0 +1,29 @@
+library IEEE;
+use IEEE.STD_LOGIC_1164.ALL;
+
+-- Esse módulo realiza um Shift para a esquerda de A.
+-- A é um vetor de 4 bits que serve como entrada da operação.
+-- Essa operação funciona "empurrando" um '0' pela esquerda do número binário A.
+-- Assim, o 0 ocupa S(3), A(3) ocupa S(2) e assim por diante.
+-- S é a resposta da operação, sendo o número A com um shift para a esquerda.
+
+entity leftShift is
+			  
+Port ( A : in  STD_LOGIC_VECTOR(3 downto 0);
+	   S : out  STD_LOGIC_VECTOR(3 downto 0));
+		
+			  
+end leftShift;
+
+architecture Behavioral of leftShift is
+
+begin
+
+S(3) <= '0';
+S(2) <= A(3);
+S(1) <= A(2);
+S(0) <= A(1);
+
+
+end Behavioral;
+
