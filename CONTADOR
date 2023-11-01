@@ -1,0 +1,42 @@
+library IEEE;
+use IEEE.STD_LOGIC_1164.ALL;
+use IEEE.numeric_std.all;
+
+-- Nesse módulo, é criado o contador baseado no Clock da placa.
+-- Assim como o MAIN, para realizar os testes no simulador do ISE, esse módulo não foi necessário. Ele é necessário apenas
+-- para a implementação na placa.
+
+entity contador is
+	generic(t_max : integer := 40000000); -- aguarda 2s
+	port(
+		clk: in std_logic; -- Clock
+		reset: in std_logic; -- Reset Assíncrono
+		contadorAB: out unsigned (7 downto 0) := "00000000" -- saida
+		
+	);
+end contador;
+
+architecture Behavioral of contador is
+
+signal contadorAB_signal: unsigned (7 downto 0) := "00000000"; 
+
+begin
+
+	contador_process : process(clk, reset) 
+		variable t : integer range t_max downto 0 := 0; 
+		begin
+			if(reset = '1') then
+				contadorAB_signal <= "00000000"; 
+			elsif rising_edge(clk) then
+				if (t <= t_max) then
+					t := t + 1;
+				else 
+					contadorAB_signal <= contadorAB_signal + 1; 
+					t := 0; 
+				end if;
+			end if;
+	end process;
+	
+contadorAB <= contadorAB_signal; 
+
+end Behavioral;
