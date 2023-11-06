@@ -7,11 +7,11 @@ use IEEE.numeric_std.all;
 -- para a implementação na placa.
 
 entity contador is
-	generic(t_max : integer := 40000000); -- aguarda 2s
+	generic(t_max : integer := 40000000);
 	port(
 		clk: in std_logic; -- Clock
 		reset: in std_logic; -- Reset Assíncrono
-		contadorAB: out unsigned (7 downto 0) := "00000000" -- saida
+		contadorAB: out unsigned (7 downto 0) := "00000000" 
 		
 	);
 end contador;
